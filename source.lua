@@ -205,7 +205,7 @@ local function startMonsterESP()
             updateDrawingESP(d.esp, pos, d.name, pos ~= nil)
         end
     end)
-    Lib:Notify("ESP", "Monster ESP ON — tracking " .. #monsterESPs .. " NPCs", 3, "success")
+    Lib:Notify("ESP", "Monster ESP ON - tracking " .. #monsterESPs .. " NPCs", 3, "success")
 end
 
 espSec:Toggle("Monster ESP", false, function(on)
@@ -268,7 +268,7 @@ local function startPlayerESP()
             updateDrawingESP(d.esp, pos, d.name, pos ~= nil)
         end
     end)
-    Lib:Notify("ESP", "Player ESP — tracking " .. #playerESPs .. " players", 3, "success")
+    Lib:Notify("ESP", "Player ESP - tracking " .. #playerESPs .. " players", 3, "success")
 end
 
 espSec:Toggle("Players", false, function(on)
