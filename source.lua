@@ -4,7 +4,6 @@ local Players    = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local player     = Players.LocalPlayer
 
--- Window
 local win = Lib:CreateWindow({
     title       = "Identity Fraud",
     subtitle    = "ESP & Teleport",
@@ -17,9 +16,6 @@ local win = Lib:CreateWindow({
 })
 
 win:AddSettingsTab("cog")
-
-
--- data
 
 local maze1Locs = {
     { label = "Mirror",      pos = Vector3.new(-366.4, 3.4, -171.1) },
@@ -156,7 +152,6 @@ local function makeLocationESP(locations, color)
     return start, clear
 end
 
--- ESP
 local espTab = win:Tab("ESP", "eye")
 local espSec = espTab:Section("ESP Toggles", "Full", "Highlight key objects through walls")
 
@@ -212,7 +207,7 @@ espSec:Toggle("Monster ESP", false, function(on)
     if on then startMonsterESP() else clearMonsterESP() end
 end)
 
--- Maze 1 ESP
+-- Maze 1 ESP (includes Mirror)
 local startMaze1ESP, clearMaze1ESP = makeLocationESP(maze1Locs, Color3.fromRGB(0, 170, 255))
 espSec:Toggle("Maze 1 ESP", false, function(on)
     if on then startMaze1ESP() else clearMaze1ESP() end
@@ -224,13 +219,11 @@ espSec:Toggle("Maze 2 ESP", false, function(on)
     if on then startMaze2ESP() else clearMaze2ESP() end
 end)
 
--- Maze 3 ESP
 local startMaze3ESP, clearMaze3ESP = makeLocationESP(maze3Locs, Color3.fromRGB(0, 170, 255))
 espSec:Toggle("Maze 3 ESP", false, function(on)
     if on then startMaze3ESP() else clearMaze3ESP() end
 end)
 
--- Player ESP
 local playerESPs = {}
 local playerConn
 local playerOn = false
@@ -268,15 +261,13 @@ local function startPlayerESP()
             updateDrawingESP(d.esp, pos, d.name, pos ~= nil)
         end
     end)
-    Lib:Notify("ESP", "Player ESP - tracking " .. #playerESPs .. " players", 3, "success")
+    Lib:Notify("ESP", "Player ESP ON - tracking " .. #playerESPs .. " players", 3, "success")
 end
 
 espSec:Toggle("Players", false, function(on)
     if on then startPlayerESP() else clearPlayerESP() end
 end)
 
-
--- tp
 local tpTab = win:Tab("Teleport", "compass")
 
 local function teleportTo(pos)
@@ -289,7 +280,6 @@ local function teleportTo(pos)
     Lib:Notify("Teleport", "Teleported!", 2, "success")
 end
 
--- Player Teleports (FIRST section)
 local tp4 = tpTab:Section("Player Teleports", "Full")
 
 local selectedPlayer = nil
@@ -366,13 +356,11 @@ tp4:Button("Teleport to Player", function()
     end
 end)
 
--- Maze 1 Teleports
 local tp1 = tpTab:Section("Maze 1 Teleports", "Full")
 for _, loc in ipairs(maze1Locs) do
     tp1:Button(loc.label, function() teleportTo(loc.pos) end)
 end
 
--- Maze 2 Teleports
 local tp2 = tpTab:Section("Maze 2 Teleports", "Full")
 for _, loc in ipairs(maze2Locs) do
     tp2:Button(loc.label, function() teleportTo(loc.pos) end)
@@ -383,3 +371,55 @@ local tp3 = tpTab:Section("Maze 3 Teleports", "Full")
 for _, loc in ipairs(maze3Locs) do
     tp3:Button(loc.label, function() teleportTo(loc.pos) end)
 end
+
+local puzzleTab = win:Tab("Puzzles", "code")
+local partySec = puzzleTab:Section("Party Room", "Full", "Base64 door code solver")
+
+partySec:Button("Solve Code", function()
+    local sd = game.Workspace:FindFirstChild("Secret Doors")
+    if not sd then
+        Lib:Notify("Puzzle", "Secret Doors not found", 3, "error")
+        return
+    end
+    local pad = sd:FindFirstChild("Pad")
+    if not pad then
+        Lib:Notify("Puzzle", "Pad not found", 3, "error")
+        return
+    end
+    local sg = pad:FindFirstChild("SurfaceGui")
+    if not sg then
+        Lib:Notify("Puzzle", "SurfaceGui not found", 3, "error")
+        return
+    end
+    local tl = sg:FindFirstChild("TextLabel")
+    if not tl then
+        Lib:Notify("Puzzle", "TextLabel not found", 3, "error")
+        return
+    end
+
+    local raw = tl.Text
+    if not raw or raw == "" then
+        Lib:Notify("Puzzle", "No base64 text found", 3, "error")
+        return
+    end
+
+    local decoded = base64decode(raw)
+    if not decoded or decoded == "" then
+        Lib:Notify("Puzzle", "Failed to decode base64", 3, "error")
+        return
+    end
+
+    local code = ""
+    for i = 1, #decoded do
+        local c = decoded:sub(i, i)
+        if c >= "0" and c <= "9" then
+            code = code .. c
+        end
+    end
+
+    if code == "" then
+        Lib:Notify("Puzzle", "No code found in: " .. decoded, 5, "error")
+    else
+        Lib:Notify("Code: " .. code, decoded, 30, "success")
+    end
+end)
